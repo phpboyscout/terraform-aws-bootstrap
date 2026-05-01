@@ -33,6 +33,7 @@ locals {
 }
 
 module "oidc_provider" {
+  # checkov:skip=CKV_TF_1:Terraform Registry sources use semver tags, not commit hashes. `~> 5.0` allows minor + patch updates and is the conventional pinning for terraform-aws-modules; Dependabot tracks new majors.
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-provider"
   version = "~> 5.0"
 
@@ -42,6 +43,7 @@ module "oidc_provider" {
 }
 
 module "role" {
+  # checkov:skip=CKV_TF_1:Terraform Registry sources use semver tags, not commit hashes. `~> 5.0` allows minor + patch updates and is the conventional pinning for terraform-aws-modules; Dependabot tracks new majors.
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
   version = "~> 5.0"
 

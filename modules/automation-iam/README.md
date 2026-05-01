@@ -100,6 +100,43 @@ policy_arns = {
 ```
 
 <!-- BEGIN_TF_DOCS -->
-<!-- terraform-docs auto-injects the inputs/outputs/requirements
-     tables here on `just docs`. -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0, < 7.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0, < 7.0 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_create_oidc_provider"></a> [create\_oidc\_provider](#input\_create\_oidc\_provider) | Whether to create the GitHub Actions OIDC identity provider. Set to false if the account already has one (only one IDP per provider URL is allowed per account). | `bool` | `true` | no |
+| <a name="input_github_repo"></a> [github\_repo](#input\_github\_repo) | GitHub `org/repo` slug whose OIDC tokens this role trusts. Subject filters are constructed from this — override `subject_filters` if you need finer scoping (per-environment, per-ref, etc.). | `string` | n/a | yes |
+| <a name="input_max_session_duration"></a> [max\_session\_duration](#input\_max\_session\_duration) | Maximum session duration for the role, in seconds. AWS-allowed range is 3600–43200 (1–12 hours). | `number` | `3600` | no |
+| <a name="input_policy_arns"></a> [policy\_arns](#input\_policy\_arns) | Map of IAM policy attachments to apply to the role. Keys are stable identifiers (used as Terraform resource keys); values are policy ARNs. Default attaches `AdministratorAccess` — tighten via override for production. | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
+| <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the IAM role GitHub Actions assumes via OIDC. | `string` | n/a | yes |
+| <a name="input_subject_filters"></a> [subject\_filters](#input\_subject\_filters) | OIDC `sub` claim patterns that may assume this role. Empty list means use the defaults: `refs/heads/main` + `pull_request`. | `list(string)` | `[]` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to every taggable resource this module creates. Merged on top of the consuming provider's `default_tags` — module-supplied tags win on key conflict. | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the GitHub Actions OIDC IDP. Returned regardless of whether this module created it (the ARN is canonical for the account). |
+| <a name="output_oidc_provider_created_here"></a> [oidc\_provider\_created\_here](#output\_oidc\_provider\_created\_here) | Whether this module call created the OIDC provider. False means the IDP existed before this apply (or was created by a separate call). |
+| <a name="output_role_arn"></a> [role\_arn](#output\_role\_arn) | ARN of the IAM role GitHub Actions assumes via OIDC. Feed this to `aws-actions/configure-aws-credentials` as `role-to-assume`. |
+| <a name="output_role_name"></a> [role\_name](#output\_role\_name) | Name of the IAM role. |
+| <a name="output_subjects"></a> [subjects](#output\_subjects) | OIDC subject patterns this role trusts. Useful for documentation / debugging. |
 <!-- END_TF_DOCS -->

@@ -8,29 +8,6 @@ sections:
     - requirements
     - resources
 
-content: |-
-  {{ .Header }}
-
-  ## Requirements
-
-  {{ .Requirements }}
-
-  ## Providers
-
-  {{ .Providers }}
-
-  ## Resources
-
-  {{ .Resources }}
-
-  ## Inputs
-
-  {{ .Inputs }}
-
-  ## Outputs
-
-  {{ .Outputs }}
-
 output:
   file: README.md
   mode: inject

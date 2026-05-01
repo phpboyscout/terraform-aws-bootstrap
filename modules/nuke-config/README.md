@@ -110,6 +110,39 @@ See the full grammar at <https://aws-nuke.ekristen.dev/config/#filters>.
   here. The module skips the convention deliberately.
 
 <!-- BEGIN_TF_DOCS -->
-<!-- terraform-docs auto-injects the inputs/outputs/requirements
-     tables here on `just docs`. -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.0, < 3.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_local"></a> [local](#provider\_local) | >= 2.0, < 3.0 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [local_file.this](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID this config targets. aws-nuke refuses to operate against any account whose ID isn't listed here. | `string` | n/a | yes |
+| <a name="input_blocklist"></a> [blocklist](#input\_blocklist) | Account IDs aws-nuke MUST NEVER target — even if mistakenly invoked against them. ekristen requires at least one entry as a safety net; the default placeholder satisfies that. Add your production / shared-services account IDs here when this config grows beyond a single account. | `list(string)` | <pre>[<br/>  "000000000000"<br/>]</pre> | no |
+| <a name="input_filters"></a> [filters](#input\_filters) | aws-nuke filters: a map of resource type → list of filter expressions. Each expression is either a string (matches the resource's display identifier) or an object `{ type, property, value, invert }`. See https://aws-nuke.ekristen.dev/config/#filters for the full grammar. The default filters out AWS-managed service-linked roles (which cannot be deleted). | `any` | <pre>{<br/>  "IAMRole": [<br/>    {<br/>      "type": "glob",<br/>      "value": "AWSServiceRoleFor*"<br/>    }<br/>  ],<br/>  "IAMRolePolicyAttachment": [<br/>    {<br/>      "type": "glob",<br/>      "value": "AWSServiceRoleFor* -> *"<br/>    }<br/>  ]<br/>}</pre> | no |
+| <a name="input_output_path"></a> [output\_path](#input\_output\_path) | If set, the rendered YAML is also written to this filesystem path (relative to the consuming stack's root). The directory must exist. Useful when the consuming stack also drives an aws-nuke invocation. Set to `null` to skip the write — the rendered YAML is still available via the `yaml` output. | `string` | `null` | no |
+| <a name="input_regions"></a> [regions](#input\_regions) | Regions aws-nuke scans. Use `global` for IAM/Route53/CloudFront and per-region values for everything else. ekristen also accepts `all` to scan every enabled region — but that mixes poorly with explicit values; pick one or the other. | `list(string)` | <pre>[<br/>  "global"<br/>]</pre> | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_path"></a> [path](#output\_path) | Filesystem path the rendered YAML was written to. Null if `var.output_path` was not set. |
+| <a name="output_yaml"></a> [yaml](#output\_yaml) | Rendered aws-nuke YAML configuration as a string. Suitable for piping to a file or for use with the `local_file` resource if more control is needed than `var.output_path` provides. |
 <!-- END_TF_DOCS -->
