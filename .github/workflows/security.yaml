@@ -8,10 +8,13 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Workflow-level permissions are MINIMAL. Each job grants the elevations
+# it actually needs at the job level. Scorecard's workflow verification
+# explicitly rejects globally-granted `security-events: write`, so this
+# layout is required for scorecard, and is good practice for the others
+# regardless. See https://github.com/ossf/scorecard-action#workflow-restrictions
 permissions:
   contents: read
-  security-events: write
-  actions: read
 
 concurrency:
   group: security-${{ github.ref }}
@@ -21,6 +24,10 @@ jobs:
   trivy:
     name: trivy config + vuln
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,6 +63,10 @@ jobs:
   checkov:
     name: checkov
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
