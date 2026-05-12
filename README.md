@@ -14,8 +14,9 @@ Three concerns, no more:
    YAML scoped to your account and regions. Templated; you run `aws-nuke` itself.
 2. **`state-backend`** — S3 bucket + customer-managed KMS key + S3-native state
    locking. No DynamoDB.
-3. **`automation-iam`** — GitHub OIDC identity provider + an automation IAM role
-   that CI assumes to apply downstream stacks.
+3. **`automation-iam`** — OIDC identity provider + an automation IAM role
+   that CI assumes to apply downstream stacks. Supports both GitHub Actions
+   (default) and GitLab CI via the `ci_provider` input.
 
 ## What's deliberately NOT in scope
 
@@ -30,14 +31,14 @@ module does the bare minimum so you can stand the rest up via CI.
 
 ```hcl
 module "bootstrap" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.1.0"
+  source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.2.0"
 
   account_id   = "049815585546"
   region       = "eu-west-2"
   project_name = "phpboyscout"
 
-  # GitHub OIDC trust — the automation role can be assumed by workflows
-  # in this repo, scoped to main and pull-request refs.
+  # GitHub OIDC trust (the default) — the automation role can be assumed
+  # by workflows in this repo, scoped to main and pull-request refs.
   github_repo  = "phpboyscout/infra"
 
   tags = {
@@ -48,7 +49,26 @@ module "bootstrap" {
 }
 ```
 
-See [`examples/minimal/`](./examples/minimal/) for a complete, runnable caller.
+For GitLab CI, switch the `ci_provider` and pass `gitlab_project` instead:
+
+```hcl
+module "bootstrap" {
+  source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.2.0"
+
+  account_id     = "049815585546"
+  region         = "eu-west-2"
+  project_name   = "phpboyscout"
+  ci_provider    = "gitlab"
+  gitlab_project = "phpboyscout/infra"
+
+  # Skip the S3 state backend when using GitLab-managed HTTP state.
+  enable_state_backend = false
+}
+```
+
+See [`examples/minimal/`](./examples/minimal/) (GitHub) and
+[`examples/gitlab/`](./examples/gitlab/) (GitLab) for complete, runnable
+callers.
 
 ## Conventions
 
@@ -74,8 +94,12 @@ The full microsite — including specs and design rationale — is at
 ## Roadmap
 
 - v0.1: AWS only — `state-backend`, `automation-iam`, `nuke-config`.
-- v0.2+: tighten OIDC trust per-environment (separate plan/apply roles), optional
-  IAM policy boundary for the automation role.
+- v0.2: GitLab CI support alongside GitHub Actions on `automation-iam`
+  (additive, backward-compatible); root-level `enable_state_backend`
+  toggle for consumers that manage state externally.
+- v0.2+: tighten OIDC trust per-environment (separate plan/apply roles),
+  optional IAM policy boundary for the automation role, GitLab Terraform
+  Module Registry publishing for the canonical `source` form.
 - Future: sibling repos `terraform-gcp-bootstrap` and `terraform-azure-bootstrap`
   with the same shape (state backend + automation identity + nuke-config) so
   callers can swap providers cleanly.
@@ -106,30 +130,34 @@ No resources.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID this module bootstraps. Must match the credentials in use; the module's `allowed_account_ids` provider safety is the caller's job. | `string` | n/a | yes |
-| <a name="input_automation_create_oidc_provider"></a> [automation\_create\_oidc\_provider](#input\_automation\_create\_oidc\_provider) | Whether to create the GitHub Actions OIDC IDP. Set to false if the account already has one (the IDP is a singleton per provider URL). | `bool` | `true` | no |
+| <a name="input_automation_create_oidc_provider"></a> [automation\_create\_oidc\_provider](#input\_automation\_create\_oidc\_provider) | Whether to create the CI provider's OIDC IDP. Set to false if the account already has one (the IDP is a singleton per provider URL). | `bool` | `true` | no |
 | <a name="input_automation_policy_arns"></a> [automation\_policy\_arns](#input\_automation\_policy\_arns) | IAM policies attached to the automation role. Default attaches `AdministratorAccess` — tighten for production-grade trust (e.g. PowerUserAccess + IAMReadOnlyAccess, or a custom managed policy). | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
-| <a name="input_automation_subject_filters"></a> [automation\_subject\_filters](#input\_automation\_subject\_filters) | OIDC subject claim patterns the automation role trusts. Empty list means use the sub-module's default (`refs/heads/main` + `pull_request` for the configured `github_repo`). | `list(string)` | `[]` | no |
-| <a name="input_github_repo"></a> [github\_repo](#input\_github\_repo) | GitHub `org/repo` slug whose OIDC tokens the automation role trusts. Subject filters default to refs/heads/main + pull\_request for this repo; override `automation_subject_filters` for finer scoping. | `string` | n/a | yes |
+| <a name="input_automation_subject_filters"></a> [automation\_subject\_filters](#input\_automation\_subject\_filters) | OIDC subject claim patterns the automation role trusts. Empty list means use the sub-module's provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:main` + `ref_type:mr:ref:*`. | `list(string)` | `[]` | no |
+| <a name="input_ci_provider"></a> [ci\_provider](#input\_ci\_provider) | CI provider whose OIDC tokens the automation role trusts. One of `github` or `gitlab`. Default `github` preserves v0.1.x behaviour. | `string` | `"github"` | no |
+| <a name="input_enable_state_backend"></a> [enable\_state\_backend](#input\_enable\_state\_backend) | Whether to provision the S3 + KMS state backend sub-module. Default `true` preserves v0.1.x behaviour. Set to `false` when the consumer manages state externally (e.g. GitLab-managed HTTP backend) — the corresponding `tfstate_*` outputs return null. | `bool` | `true` | no |
+| <a name="input_github_repo"></a> [github\_repo](#input\_github\_repo) | GitHub `org/repo` slug whose OIDC tokens the automation role trusts. Required when `ci_provider = "github"`. Subject filters default to refs/heads/main + pull\_request for this repo; override `automation_subject_filters` for finer scoping. | `string` | `null` | no |
+| <a name="input_gitlab_project"></a> [gitlab\_project](#input\_gitlab\_project) | GitLab `group/project` slug whose OIDC tokens the automation role trusts. Required when `ci_provider = "gitlab"`. Supports nested groups (`group/subgroup/project`). Subject filters default to `ref_type:branch:ref:main` + `ref_type:mr:ref:*` for this project; override `automation_subject_filters` for finer scoping. | `string` | `null` | no |
 | <a name="input_nuke_filters"></a> [nuke\_filters](#input\_nuke\_filters) | aws-nuke filters merged into the generated config. See modules/nuke-config/README.md for the grammar. Typical preservations: the bootstrap IAM user, the IAM account alias, the automation role and OIDC provider once they exist. | `any` | `{}` | no |
 | <a name="input_nuke_output_path"></a> [nuke\_output\_path](#input\_nuke\_output\_path) | Filesystem path for the rendered aws-nuke YAML. Null skips the disk write — the YAML is still available via the `nuke_config_yaml` output. Typical: `${path.root}/scripts/aws-nuke/config.yaml`. | `string` | `null` | no |
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Short, kebab-case identifier used to derive default resource names (state bucket, KMS alias, automation role). Override the individual `*_name` inputs to break this convention. | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Primary region. The state-backend lives here; the automation role and OIDC provider are global IAM resources. | `string` | n/a | yes |
-| <a name="input_state_bucket_name"></a> [state\_bucket\_name](#input\_state\_bucket\_name) | S3 bucket name for the remote state backend. Defaults to `<project_name>-tfstate-<account_id>`. S3 bucket names are globally unique; override if the default collides. | `string` | `null` | no |
+| <a name="input_state_bucket_name"></a> [state\_bucket\_name](#input\_state\_bucket\_name) | S3 bucket name for the remote state backend. Defaults to `<project_name>-tfstate-<account_id>`. S3 bucket names are globally unique; override if the default collides. Ignored when `enable_state_backend = false`. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to every taggable resource the state-backend and automation-iam sub-modules create. Merged on top of the consuming provider's `default_tags` — module-supplied tags win on key conflict. nuke-config has no taggable AWS resources, so it ignores this input. | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_automation_role_arn"></a> [automation\_role\_arn](#output\_automation\_role\_arn) | ARN of the automation IAM role. Pass this to `aws-actions/configure-aws-credentials` as `role-to-assume`. |
+| <a name="output_automation_role_arn"></a> [automation\_role\_arn](#output\_automation\_role\_arn) | ARN of the automation IAM role. Pass this to `aws-actions/configure-aws-credentials` (GitHub) or to the AWS CLI `--web-identity-token-file` flow (GitLab CI). |
 | <a name="output_automation_role_name"></a> [automation\_role\_name](#output\_automation\_role\_name) | Name of the automation role. |
+| <a name="output_ci_provider"></a> [ci\_provider](#output\_ci\_provider) | CI provider this bootstrap was configured for (`github` or `gitlab`). |
 | <a name="output_nuke_config_path"></a> [nuke\_config\_path](#output\_nuke\_config\_path) | Filesystem path the rendered aws-nuke YAML was written to. Null if `nuke_output_path` was not set. |
 | <a name="output_nuke_config_yaml"></a> [nuke\_config\_yaml](#output\_nuke\_config\_yaml) | Rendered aws-nuke YAML configuration. Pipe to a file or use `nuke_output_path` to have the module write it. |
-| <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the GitHub Actions OIDC IDP (canonical for the account, regardless of who created it). |
-| <a name="output_tfstate_backend_config"></a> [tfstate\_backend\_config](#output\_tfstate\_backend\_config) | Map of values suitable for `backend "s3"` config in a consuming stack. Includes use\_lockfile = true so callers don't forget S3-native locking. |
-| <a name="output_tfstate_bucket_arn"></a> [tfstate\_bucket\_arn](#output\_tfstate\_bucket\_arn) | ARN of the state bucket. |
-| <a name="output_tfstate_bucket_name"></a> [tfstate\_bucket\_name](#output\_tfstate\_bucket\_name) | Name of the S3 bucket holding remote state. |
-| <a name="output_tfstate_bucket_region"></a> [tfstate\_bucket\_region](#output\_tfstate\_bucket\_region) | Region the state bucket is in. |
-| <a name="output_tfstate_kms_alias_name"></a> [tfstate\_kms\_alias\_name](#output\_tfstate\_kms\_alias\_name) | Full alias of the state-encryption CMK (with `alias/` prefix). |
-| <a name="output_tfstate_kms_key_arn"></a> [tfstate\_kms\_key\_arn](#output\_tfstate\_kms\_key\_arn) | ARN of the customer CMK encrypting state. |
+| <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the OIDC IDP — `token.actions.githubusercontent.com` (GitHub) or `gitlab.com` (GitLab). Canonical for the account, regardless of who created it. |
+| <a name="output_tfstate_backend_config"></a> [tfstate\_backend\_config](#output\_tfstate\_backend\_config) | Map of values suitable for `backend "s3"` config in a consuming stack. Includes use\_lockfile = true so callers don't forget S3-native locking. Null when `enable_state_backend = false`. |
+| <a name="output_tfstate_bucket_arn"></a> [tfstate\_bucket\_arn](#output\_tfstate\_bucket\_arn) | ARN of the state bucket. Null when `enable_state_backend = false`. |
+| <a name="output_tfstate_bucket_name"></a> [tfstate\_bucket\_name](#output\_tfstate\_bucket\_name) | Name of the S3 bucket holding remote state. Null when `enable_state_backend = false`. |
+| <a name="output_tfstate_bucket_region"></a> [tfstate\_bucket\_region](#output\_tfstate\_bucket\_region) | Region the state bucket is in. Null when `enable_state_backend = false`. |
+| <a name="output_tfstate_kms_alias_name"></a> [tfstate\_kms\_alias\_name](#output\_tfstate\_kms\_alias\_name) | Full alias of the state-encryption CMK (with `alias/` prefix). Null when `enable_state_backend = false`. |
+| <a name="output_tfstate_kms_key_arn"></a> [tfstate\_kms\_key\_arn](#output\_tfstate\_kms\_key\_arn) | ARN of the customer CMK encrypting state. Null when `enable_state_backend = false`. |
 <!-- END_TF_DOCS -->
