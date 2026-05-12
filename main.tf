@@ -21,6 +21,7 @@ locals {
 }
 
 module "state_backend" {
+  count  = var.enable_state_backend ? 1 : 0
   source = "./modules/state-backend"
 
   name       = local.state_bucket_name
@@ -34,7 +35,9 @@ module "state_backend" {
 module "automation_iam" {
   source = "./modules/automation-iam"
 
+  ci_provider          = var.ci_provider
   github_repo          = var.github_repo
+  gitlab_project       = var.gitlab_project
   role_name            = local.automation_role_name
   policy_arns          = var.automation_policy_arns
   subject_filters      = var.automation_subject_filters
