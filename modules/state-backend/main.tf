@@ -48,6 +48,7 @@ data "aws_iam_policy_document" "kms" {
 
 # ---------- S3 bucket ---------------------------------------------------
 
+#trivy:ignore:AWS-0089 Bucket access logging is a downstream concern. Callers wire CloudTrail S3 data events for this bucket in their security-baseline stack; bucket-level logs would duplicate. Same rationale as checkov CKV_AWS_18 below.
 resource "aws_s3_bucket" "this" {
   # checkov:skip=CKV_AWS_18:Bucket access logging is a downstream concern. Callers wire CloudTrail S3 data events for this bucket in their security-baseline stack — bucket-level access logs would duplicate that record.
   # checkov:skip=CKV_AWS_144:Cross-region replication is unnecessary for a state bucket. The bucket is small, append-only via tofu, and versioning provides recovery. Multi-region DR is a separate concern outside bootstrap.
