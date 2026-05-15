@@ -60,20 +60,20 @@ values from this output into a generated `backend.tf` or via
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.10.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0, < 7.0 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0, < 7.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_kms_alias.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_s3_bucket.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
@@ -87,7 +87,7 @@ values from this output into a generated `backend.tf` or via
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_abort_incomplete_multipart_upload_days"></a> [abort\_incomplete\_multipart\_upload\_days](#input\_abort\_incomplete\_multipart\_upload\_days) | Days after which incomplete multipart uploads are aborted. Closes CKV\_AWS\_300. | `number` | `7` | no |
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID this bucket belongs to. Used as the root principal in the KMS key policy. | `string` | n/a | yes |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether `tofu destroy` is allowed to delete the bucket even when it contains state objects. NEVER true for a real backend — set true only for ephemeral test buckets in CI. | `bool` | `false` | no |
@@ -102,7 +102,7 @@ values from this output into a generated `backend.tf` or via
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_backend_config"></a> [backend\_config](#output\_backend\_config) | Map of values suitable for `backend "s3"` config in a consuming stack. Spread into the backend block: `bucket = ..., key = ..., region = ..., encrypt = true, kms_key_id = ..., use_lockfile = true`. |
 | <a name="output_bucket_arn"></a> [bucket\_arn](#output\_bucket\_arn) | ARN of the state bucket. |
 | <a name="output_bucket_id"></a> [bucket\_id](#output\_bucket\_id) | Name of the state bucket. |

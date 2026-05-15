@@ -143,20 +143,20 @@ policy_arns = {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0, < 7.0 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0, < 7.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_iam_openid_connect_provider.gitlab](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider) | resource |
 | [aws_iam_role.gitlab](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.gitlab](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
@@ -164,7 +164,7 @@ policy_arns = {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_ci_provider"></a> [ci\_provider](#input\_ci\_provider) | CI provider whose OIDC tokens this role trusts. One of `github` or `gitlab`. Default `github` preserves v0.1.x behaviour. | `string` | `"github"` | no |
 | <a name="input_create_oidc_provider"></a> [create\_oidc\_provider](#input\_create\_oidc\_provider) | Whether to create the OIDC identity provider. Set to false if the account already has one (only one IDP per provider URL is allowed per account). | `bool` | `true` | no |
 | <a name="input_github_repo"></a> [github\_repo](#input\_github\_repo) | GitHub `org/repo` slug whose OIDC tokens this role trusts. Required when `ci_provider = "github"`. Subject filters are constructed from this — override `subject_filters` if you need finer scoping (per-environment, per-ref, etc.). | `string` | `null` | no |
@@ -178,7 +178,7 @@ policy_arns = {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_ci_provider"></a> [ci\_provider](#output\_ci\_provider) | CI provider this module instance is configured for (`github` or `gitlab`). |
 | <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the OIDC IDP — `token.actions.githubusercontent.com` (GitHub) or `gitlab.com` (GitLab). Returned regardless of whether this module created it (the ARN is canonical for the account). |
 | <a name="output_oidc_provider_created_here"></a> [oidc\_provider\_created\_here](#output\_oidc\_provider\_created\_here) | Whether this module call created the OIDC provider. False means the IDP existed before this apply (or was created by a separate call). |
