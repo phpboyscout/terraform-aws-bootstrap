@@ -20,8 +20,9 @@ Markdown==3.10.2 \
     --hash=sha256:e91464b71ae3ee7afd3017d9f358ef0baf158fd9a298db92f1d4761133824c36
 Pygments==2.20.0 \
     --hash=sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176
-pymdown-extensions==10.21.2 \
-    --hash=sha256:5c0fd2a2bea14eb39af8ff284f1066d898ab2187d81b889b75d46d4348c01638
+pymdown-extensions==10.21.3 \
+    --hash=sha256:72cfcf55f07aea0d4af2c4f11dd4e52466ddfb1bb819673146398e0bd3a77354 \
+    --hash=sha256:d7a5d08014fc571e80ca21dd6f854e31f94c489800350564d55d15b3c41e76b6
 PyYAML==6.0.3 \
     --hash=sha256:c458b6d084f9b935061bc36216e8a69a7e293a2f1e68bf956dcd9e6cbcd143f5
 zensical==0.0.33 \
