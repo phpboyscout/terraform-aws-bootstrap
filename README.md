@@ -112,7 +112,7 @@ MIT — see [LICENSE](./LICENSE).
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.10.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0, < 7.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.0, < 3.0 |
@@ -128,7 +128,7 @@ No resources.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID this module bootstraps. Must match the credentials in use; the module's `allowed_account_ids` provider safety is the caller's job. | `string` | n/a | yes |
 | <a name="input_automation_create_oidc_provider"></a> [automation\_create\_oidc\_provider](#input\_automation\_create\_oidc\_provider) | Whether to create the CI provider's OIDC IDP. Set to false if the account already has one (the IDP is a singleton per provider URL). | `bool` | `true` | no |
 | <a name="input_automation_policy_arns"></a> [automation\_policy\_arns](#input\_automation\_policy\_arns) | IAM policies attached to the automation role. Default attaches `AdministratorAccess` — tighten for production-grade trust (e.g. PowerUserAccess + IAMReadOnlyAccess, or a custom managed policy). | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
@@ -147,7 +147,7 @@ No resources.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_automation_role_arn"></a> [automation\_role\_arn](#output\_automation\_role\_arn) | ARN of the automation IAM role. Pass this to `aws-actions/configure-aws-credentials` (GitHub) or to the AWS CLI `--web-identity-token-file` flow (GitLab CI). |
 | <a name="output_automation_role_name"></a> [automation\_role\_name](#output\_automation\_role\_name) | Name of the automation role. |
 | <a name="output_ci_provider"></a> [ci\_provider](#output\_ci\_provider) | CI provider this bootstrap was configured for (`github` or `gitlab`). |
