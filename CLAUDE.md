@@ -62,15 +62,15 @@ Master spec: `2026-04-26-aws-bootstrap-v0.1.md`.
   `terraform-docs` regenerates the inputs/outputs sections of each
   module's README.
 - **Pre-commit hooks** mirror the CI gate.
-- **CI** lives in `.github/workflows/`: `ci.yaml`, `security.yaml`,
-  `docs.yaml` (Zensical → Pages).
+- **CI** lives in `.gitlab-ci.yml`, consuming components from
+  `phpboyscout/cicd` (lint / security / validate / `zensical-pages`
+  for the docs site).
 
 ## Branch and commit workflow
 
 - Branch from `develop`. PR to `develop`. `develop → main` is the release PR.
-- Branch protection is **active** on both branches. Definitions in
-  `.github/rulesets/`; update with `./scripts/apply-branch-protection.sh
-  update`.
+- Branch protection is **active** on both branches, managed in the
+  GitLab project UI.
 
 ### Commit Conventions
 
