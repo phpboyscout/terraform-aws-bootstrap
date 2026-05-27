@@ -57,7 +57,7 @@ variable "github_repo" {
 }
 
 variable "gitlab_project" {
-  description = "GitLab `group/project` slug whose OIDC tokens the automation role trusts. Required when `ci_provider = \"gitlab\"`. Supports nested groups (`group/subgroup/project`). Subject filters default to `ref_type:branch:ref:main` + `ref_type:mr:ref:*` for this project; override `automation_subject_filters` for finer scoping."
+  description = "GitLab `group/project` slug whose OIDC tokens the automation role trusts. Required when `ci_provider = \"gitlab\"`. Supports nested groups (`group/subgroup/project`). Subject filters default to `ref_type:branch:ref:*` + `ref_type:tag:ref:*` for this project; override `automation_subject_filters` for finer scoping."
   type        = string
   default     = null
 
@@ -94,7 +94,7 @@ variable "automation_policy_arns" {
 }
 
 variable "automation_subject_filters" {
-  description = "OIDC subject claim patterns the automation role trusts. Empty list means use the sub-module's provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:main` + `ref_type:mr:ref:*`."
+  description = "OIDC subject claim patterns the automation role trusts. Empty list means use the sub-module's provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:*` + `ref_type:tag:ref:*`."
   type        = list(string)
   default     = []
 }

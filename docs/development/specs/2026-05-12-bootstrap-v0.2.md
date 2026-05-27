@@ -123,11 +123,17 @@ The provider-specific defaults inside `modules/automation-iam/main.tf`:
 | Provider | Default subjects |
 |---|---|
 | `github` | `["repo:${var.github_repo}:ref:refs/heads/main", "repo:${var.github_repo}:pull_request"]` |
-| `gitlab` | `["project_path:${var.gitlab_project}:ref_type:branch:ref:main", "project_path:${var.gitlab_project}:ref_type:mr:ref:*"]` |
+| `gitlab` | `["project_path:${var.gitlab_project}:ref_type:branch:ref:*", "project_path:${var.gitlab_project}:ref_type:tag:ref:*"]` |
 
-Both shapes use `StringLike` (the wildcard form in the GitLab MR
-default needs it; GitHub's exact strings work under `StringLike`
-unchanged).
+Both shapes use `StringLike` (the wildcard form in the GitLab
+branch/tag defaults needs it; GitHub's exact strings work under
+`StringLike` unchanged).
+
+> **Corrected in v0.2.1.** The original v0.2.0 GitLab default used
+> `ref_type:mr:ref:*`, but GitLab has no `mr` ref_type — merge-request
+> pipelines authenticate with `ref_type:branch:ref:<source-branch>`.
+> The default is now `ref_type:branch:ref:*` (covers branch and MR
+> pipelines) + `ref_type:tag:ref:*` (covers tag-gated applies).
 
 Consumers wanting plan-vs-apply role split (the
 `phpboyscout/infra` pattern) call this sub-module twice — once per
