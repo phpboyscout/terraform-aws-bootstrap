@@ -10,6 +10,8 @@ breaking changes to the module's public input/output surface.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-27
+
 ### Fixed
 
 - `modules/automation-iam` GitLab subject-filter defaults no longer use
