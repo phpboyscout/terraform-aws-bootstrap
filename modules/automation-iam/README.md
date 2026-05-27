@@ -98,7 +98,7 @@ Per-provider default `subject_filters`:
 | Provider | Defaults |
 |---|---|
 | `github` | `repo:<repo>:ref:refs/heads/main` (apply on `main` push) + `repo:<repo>:pull_request` (plan on PR) |
-| `gitlab` | `project_path:<project>:ref_type:branch:ref:main` (apply on `main`) + `project_path:<project>:ref_type:mr:ref:*` (plan on MR pipeline) |
+| `gitlab` | `project_path:<project>:ref_type:branch:ref:*` (any branch / MR pipeline) + `project_path:<project>:ref_type:tag:ref:*` (any tag, e.g. release apply) |
 
 For plan-vs-apply role separation, call this module once per role and
 override `subject_filters`:
@@ -172,7 +172,7 @@ policy_arns = {
 | <a name="input_max_session_duration"></a> [max\_session\_duration](#input\_max\_session\_duration) | Maximum session duration for the role, in seconds. AWS-allowed range is 3600–43200 (1–12 hours). | `number` | `3600` | no |
 | <a name="input_policy_arns"></a> [policy\_arns](#input\_policy\_arns) | Map of IAM policy attachments to apply to the role. Keys are stable identifiers (used as Terraform resource keys); values are policy ARNs. Default attaches `AdministratorAccess` — tighten via override for production. | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the IAM role assumed by the CI pipeline via OIDC. Convention: `gh-oidc-<purpose>` for GitHub, `gl-oidc-<purpose>` for GitLab (caller-supplied). | `string` | n/a | yes |
-| <a name="input_subject_filters"></a> [subject\_filters](#input\_subject\_filters) | OIDC `sub` claim patterns that may assume this role. Empty list uses the provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:main` + `ref_type:mr:ref:*`. | `list(string)` | `[]` | no |
+| <a name="input_subject_filters"></a> [subject\_filters](#input\_subject\_filters) | OIDC `sub` claim patterns that may assume this role. Empty list uses the provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:*` + `ref_type:tag:ref:*`. | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to every taggable resource this module creates. Merged on top of the consuming provider's `default_tags` — module-supplied tags win on key conflict. | `map(string)` | `{}` | no |
 
 ## Outputs

@@ -6,8 +6,8 @@ Same shape as [`../minimal/`](../minimal/) but configured for GitLab CI:
   `https://gitlab.com` and an IAM role with a GitLab-subject-shape
   trust policy.
 - `gitlab_project = "<group>/<project>"` — populates the default
-  subject filters with `project_path:<group>/<project>:ref_type:branch:ref:main`
-  and `project_path:<group>/<project>:ref_type:mr:ref:*`.
+  subject filters with `project_path:<group>/<project>:ref_type:branch:ref:*`
+  and `project_path:<group>/<project>:ref_type:tag:ref:*`.
 - `enable_state_backend = false` — the typical pairing when the
   caller uses GitLab-managed HTTP state instead of S3.
 
@@ -31,7 +31,8 @@ The IAM role's trust policy requires the OIDC token to declare:
 
 - `aud: sts.amazonaws.com`
 - `sub` matching one of the configured `subject_filters` (defaults
-  cover the main branch and any MR pipeline of the project).
+  cover any branch pipeline including MRs, plus any tag pipeline, of
+  the project).
 
 In `.gitlab-ci.yml`:
 
