@@ -51,7 +51,7 @@ variable "policy_arns" {
 }
 
 variable "subject_filters" {
-  description = "OIDC `sub` claim patterns that may assume this role. Empty list uses the provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:main` + `ref_type:mr:ref:*`."
+  description = "OIDC `sub` claim patterns that may assume this role. Empty list uses the provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:*` + `ref_type:tag:ref:*`."
   type        = list(string)
   default     = []
 }

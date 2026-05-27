@@ -26,8 +26,8 @@ locals {
   ] : []
 
   default_gitlab_subjects = local.is_gitlab && var.gitlab_project != null ? [
-    "project_path:${var.gitlab_project}:ref_type:branch:ref:main",
-    "project_path:${var.gitlab_project}:ref_type:mr:ref:*",
+    "project_path:${var.gitlab_project}:ref_type:branch:ref:*",
+    "project_path:${var.gitlab_project}:ref_type:tag:ref:*",
   ] : []
 
   default_subjects = local.is_github ? local.default_github_subjects : local.default_gitlab_subjects
@@ -139,9 +139,9 @@ data "aws_iam_policy_document" "gitlab_trust" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # StringLike accommodates the GitLab MR-wildcard default
-    # (`ref_type:mr:ref:*`) without changing the comparison shape for
-    # exact-string overrides.
+    # StringLike accommodates the GitLab branch/tag wildcard defaults
+    # (`ref_type:branch:ref:*`, `ref_type:tag:ref:*`) without changing
+    # the comparison shape for exact-string overrides.
     condition {
       test     = "StringLike"
       variable = "${local.gitlab_provider_url}:sub"

@@ -10,6 +10,18 @@ breaking changes to the module's public input/output surface.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-27
+
+### Fixed
+
+- `modules/automation-iam` GitLab subject-filter defaults no longer use
+  the non-existent `ref_type:mr` claim. GitLab merge-request pipelines
+  authenticate as `ref_type:branch:ref:<source-branch>`, so the defaults
+  are now `ref_type:branch:ref:*` (branch + MR pipelines) +
+  `ref_type:tag:ref:*` (tag-gated applies). Consumers that set
+  `subject_filters` / `automation_subject_filters` explicitly are
+  unaffected.
+
 ## [0.2.0] - 2026-05-12
 
 ### Added
