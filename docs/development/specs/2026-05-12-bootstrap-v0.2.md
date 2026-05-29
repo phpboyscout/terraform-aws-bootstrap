@@ -14,7 +14,7 @@ tags: [spec, bootstrap, v0.2, gitlab, oidc]
 - **Driven by:** [`phpboyscout/infra` GitLab migration spec][migration-spec]
   decision D1 (dual-provider OIDC) + D2 (state-backend opt-out).
 
-[migration-spec]: https://github.com/phpboyscout/infra/blob/develop/docs/development/specs/2026-05-12-gitlab-migration.md
+[migration-spec]: https://gitlab.com/phpboyscout/infra/-/blob/main/docs/development/specs/2026-05-12-gitlab-migration.md
 
 ## Summary
 

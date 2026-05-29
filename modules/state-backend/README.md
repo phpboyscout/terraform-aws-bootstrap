@@ -22,7 +22,8 @@ backend config) — no DynamoDB lock table.
 
 ```hcl
 module "state_backend" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap//modules/state-backend?ref=v0.1.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/state-backend"
+  version = "0.2.1"
 
   name       = "phpboyscout-tfstate-049815585546"
   region     = "eu-west-2"

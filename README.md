@@ -31,7 +31,8 @@ module does the bare minimum so you can stand the rest up via CI.
 
 ```hcl
 module "bootstrap" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.2.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws"
+  version = "0.2.1"
 
   account_id   = "049815585546"
   region       = "eu-west-2"
@@ -53,7 +54,8 @@ For GitLab CI, switch the `ci_provider` and pass `gitlab_project` instead:
 
 ```hcl
 module "bootstrap" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.2.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws"
+  version = "0.2.1"
 
   account_id     = "049815585546"
   region         = "eu-west-2"

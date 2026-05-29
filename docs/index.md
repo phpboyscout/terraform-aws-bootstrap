@@ -25,7 +25,7 @@ automation role this module creates.
 
 ## Start here
 
-- **[Quick start](https://github.com/phpboyscout/terraform-aws-bootstrap#quick-start)** —
+- **[Quick start](https://gitlab.com/phpboyscout/terraform-aws-bootstrap#quick-start)** —
   one-call usage in the README.
 - **[Master spec](development/specs/2026-04-26-aws-bootstrap-v0.1.md)** —
   scope decisions, rejected alternatives, multi-cloud roadmap.
@@ -34,7 +34,7 @@ automation role this module creates.
 
 ## Related projects
 
-- **[`phpboyscout/infra`](https://github.com/phpboyscout/infra)** — the first
+- **[`phpboyscout/infra`](https://gitlab.com/phpboyscout/infra)** — the first
   user of this module; private, defines the AWS account that supports
   `go-tool-base` and `rust-tool-base`.
 - **[`go-tool-base`](https://github.com/phpboyscout/go-tool-base)** and

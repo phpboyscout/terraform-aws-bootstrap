@@ -22,7 +22,8 @@ a chicken-and-egg with state. This module is just the config.
 
 ```hcl
 module "nuke_config" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap//modules/nuke-config?ref=v0.1.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/nuke-config"
+  version = "0.2.1"
 
   account_id = "049815585546"
   regions    = ["global", "eu-west-2"]
