@@ -57,7 +57,8 @@ module:
 
 ```hcl
 module "bootstrap" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.2.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws"
+  version = "0.2.1"
   # …or gitlab.com/phpboyscout/terraform-aws-bootstrap (once the
   # GitLab mirror is the primary distribution).
 }

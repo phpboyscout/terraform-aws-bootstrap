@@ -8,7 +8,8 @@
 # example can be validated in CI without resolving an external source.
 # Real callers would write:
 #
-#   source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.2.0"
+#   source  = "gitlab.com/phpboyscout/bootstrap/aws"
+#   version = "0.2.1"
 # (or the gitlab.com mirror once that lands).
 
 module "bootstrap" {
