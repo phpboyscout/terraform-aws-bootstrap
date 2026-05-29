@@ -41,7 +41,8 @@ source:
 
 ```hcl
 module "bootstrap" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap?ref=v0.1.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws"
+  version = "0.2.1"
   # ...
 }
 ```

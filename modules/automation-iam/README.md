@@ -36,7 +36,8 @@ symmetric. CI pipelines configure their token's audience to match.
 
 ```hcl
 module "automation_iam" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap//modules/automation-iam?ref=v0.2.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/automation-iam"
+  version = "0.2.1"
 
   ci_provider = "github"   # the default; can be omitted.
   github_repo = "phpboyscout/infra"
@@ -69,7 +70,8 @@ steps:
 
 ```hcl
 module "automation_iam" {
-  source = "github.com/phpboyscout/terraform-aws-bootstrap//modules/automation-iam?ref=v0.2.0"
+  source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/automation-iam"
+  version = "0.2.1"
 
   ci_provider    = "gitlab"
   gitlab_project = "phpboyscout/infra"
