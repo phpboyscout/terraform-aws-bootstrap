@@ -147,5 +147,25 @@ data "aws_iam_policy_document" "gitlab_trust" {
       variable = "${local.gitlab_provider_url}:sub"
       values   = local.subjects
     }
+
+    # AWS-recommended hardening: pin the trust to stable numeric IDs so
+    # a reclaimed project path on gitlab.com SaaS can never re-acquire
+    # the role. The path-based `sub` condition above is defence in depth.
+    dynamic "condition" {
+      for_each = var.gitlab_project_id != null ? [1] : []
+      content {
+        test     = "StringEquals"
+        variable = "${local.gitlab_provider_url}:project_id"
+        values   = [var.gitlab_project_id]
+      }
+    }
+    dynamic "condition" {
+      for_each = var.gitlab_namespace_id != null ? [1] : []
+      content {
+        test     = "StringEquals"
+        variable = "${local.gitlab_provider_url}:namespace_id"
+        values   = [var.gitlab_namespace_id]
+      }
+    }
   }
 }

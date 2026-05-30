@@ -10,6 +10,27 @@ breaking changes to the module's public input/output surface.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-05-30
+
+### Fixed
+
+- **`modules/automation-iam` — AWS-recommended GitLab OIDC trust
+  hardening.** AWS Health Event flagged that on gitlab.com SaaS,
+  deleted project / namespace paths can be reclaimed by other users, so
+  a trust policy relying on `gitlab.com:sub` (`project_path:…`) alone
+  could one day grant access to an unrelated project. Two new optional
+  inputs add `StringEquals` conditions on stable numeric IDs alongside
+  the existing path-based `sub` filter:
+  - **`gitlab_project_id`** — locks the trust to one specific project
+    (`gitlab.com:project_id` claim). Use for single-project trust.
+  - **`gitlab_namespace_id`** — locks the trust to a group, trusting
+    any project in it (`gitlab.com:namespace_id` claim). Use when more
+    than one project will assume the role.
+  - Both are exposed at the root module as well. Defaults are `null`
+    (backward compatible — v0.2.1 trust policies continue to work
+    unchanged), but at least one is strongly recommended for any new
+    deployment per AWS guidance.
+
 ## [0.2.1] - 2026-05-27
 
 ### Fixed

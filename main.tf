@@ -38,6 +38,8 @@ module "automation_iam" {
   ci_provider          = var.ci_provider
   github_repo          = var.github_repo
   gitlab_project       = var.gitlab_project
+  gitlab_project_id    = var.gitlab_project_id
+  gitlab_namespace_id  = var.gitlab_namespace_id
   role_name            = local.automation_role_name
   policy_arns          = var.automation_policy_arns
   subject_filters      = var.automation_subject_filters

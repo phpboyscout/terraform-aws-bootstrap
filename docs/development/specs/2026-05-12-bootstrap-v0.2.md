@@ -135,6 +135,17 @@ branch/tag defaults needs it; GitHub's exact strings work under
 > The default is now `ref_type:branch:ref:*` (covers branch and MR
 > pipelines) + `ref_type:tag:ref:*` (covers tag-gated applies).
 
+> **Hardened in v0.2.2 (AWS Health Event).** On gitlab.com SaaS,
+> deleted project / namespace paths can be reclaimed, so `sub` /
+> `project_path` alone is insufficient. Two new optional inputs add
+> `StringEquals` conditions on stable numeric IDs:
+> `gitlab_project_id` (`gitlab.com:project_id`) for single-project
+> trust, or `gitlab_namespace_id` (`gitlab.com:namespace_id`) for
+> trusting any project in a group. Defaults remain `null` for backward
+> compatibility, but AWS recommends setting at least one — and so do
+> we. `phpboyscout/infra` uses `gitlab_namespace_id` since more than
+> one project may eventually assume the automation role.
+
 Consumers wanting plan-vs-apply role split (the
 `phpboyscout/infra` pattern) call this sub-module twice — once per
 role — and override `subject_filters` to the per-role shape:

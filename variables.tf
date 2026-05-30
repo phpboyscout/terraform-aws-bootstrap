@@ -67,6 +67,28 @@ variable "gitlab_project" {
   }
 }
 
+variable "gitlab_project_id" {
+  description = "Stable numeric GitLab project ID locking the trust policy to that exact project (`gitlab.com:project_id` claim). On gitlab.com SaaS, project paths can be reclaimed after deletion; pinning by ID is the AWS-recommended hardening. Use this for single-project trust; for multi-project access within one namespace, use `gitlab_namespace_id` instead. Optional for backward compatibility."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.gitlab_project_id == null || can(regex("^[0-9]+$", var.gitlab_project_id))
+    error_message = "gitlab_project_id must be a numeric string (or null)."
+  }
+}
+
+variable "gitlab_namespace_id" {
+  description = "Stable numeric GitLab namespace (group) ID locking the trust policy to that group (`gitlab.com:namespace_id` claim). Trusts any project inside the namespace — the right choice when more than one project will assume the role. AWS recommends setting at least one of `gitlab_project_id` / `gitlab_namespace_id` for `ci_provider = \"gitlab\"`."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.gitlab_namespace_id == null || can(regex("^[0-9]+$", var.gitlab_namespace_id))
+    error_message = "gitlab_namespace_id must be a numeric string (or null)."
+  }
+}
+
 variable "tags" {
   description = "Tags applied to every taggable resource the state-backend and automation-iam sub-modules create. Merged on top of the consuming provider's `default_tags` — module-supplied tags win on key conflict. nuke-config has no taggable AWS resources, so it ignores this input."
   type        = map(string)
