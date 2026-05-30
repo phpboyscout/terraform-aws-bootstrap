@@ -10,6 +10,8 @@ breaking changes to the module's public input/output surface.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-05-30
+
 ### Fixed
 
 - **`modules/automation-iam` — AWS-recommended GitLab OIDC trust
