@@ -31,6 +31,28 @@ variable "gitlab_project" {
   }
 }
 
+variable "gitlab_project_id" {
+  description = "Stable numeric GitLab project ID to lock the trust policy to (the `gitlab.com:project_id` OIDC claim). On GitLab.com SaaS, project paths can be reclaimed by other users after deletion — pinning by ID is the AWS-recommended hardening. Strongly recommended when `ci_provider = \"gitlab\"`; left `null` for backward compatibility."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.gitlab_project_id == null || can(regex("^[0-9]+$", var.gitlab_project_id))
+    error_message = "gitlab_project_id must be a numeric string (e.g. \"81822745\") or null."
+  }
+}
+
+variable "gitlab_namespace_id" {
+  description = "Stable numeric GitLab group/namespace ID to lock the trust policy to (the `gitlab.com:namespace_id` OIDC claim). Less restrictive than `gitlab_project_id` — trusts any project inside the group. AWS recommends setting at least one of project_id / namespace_id; left `null` for backward compatibility."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.gitlab_namespace_id == null || can(regex("^[0-9]+$", var.gitlab_namespace_id))
+    error_message = "gitlab_namespace_id must be a numeric string (e.g. \"75964734\") or null."
+  }
+}
+
 variable "role_name" {
   description = "Name of the IAM role assumed by the CI pipeline via OIDC. Convention: `gh-oidc-<purpose>` for GitHub, `gl-oidc-<purpose>` for GitLab (caller-supplied)."
   type        = string
