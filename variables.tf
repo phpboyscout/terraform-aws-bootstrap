@@ -133,6 +133,12 @@ variable "nuke_filters" {
   default     = {}
 }
 
+variable "nuke_blocklist" {
+  description = "Account IDs aws-nuke must NEVER target, written into the generated config's blocklist:. Defaults to the ekristen placeholder ([\"000000000000\"]); set real production / shared-services account IDs when this config governs an account that shares an operator with others."
+  type        = list(string)
+  default     = ["000000000000"]
+}
+
 variable "nuke_output_path" {
   description = "Filesystem path for the rendered aws-nuke YAML. Null skips the disk write — the YAML is still available via the `nuke_config_yaml` output. Typical: `$${path.root}/scripts/aws-nuke/config.yaml`."
   type        = string
