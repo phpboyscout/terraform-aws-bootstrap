@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.3.0](https://gitlab.com/phpboyscout/terraform-aws-bootstrap/-/releases/v0.3.0)
+
+### Features
+
+- **nuke-config**: expose blocklist as root nuke_blocklist input
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
