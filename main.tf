@@ -54,5 +54,6 @@ module "nuke_config" {
   account_id  = var.account_id
   regions     = local.nuke_regions
   filters     = var.nuke_filters
+  blocklist   = var.nuke_blocklist
   output_path = var.nuke_output_path
 }
