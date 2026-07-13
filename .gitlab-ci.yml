@@ -70,7 +70,7 @@ include:
       # dir without *.tf files automatically.
       validate_paths: ". modules/automation-iam modules/nuke-config modules/state-backend examples/minimal examples/gitlab"
 
-  - component: gitlab.com/phpboyscout/cicd/zensical-pages@v0.12.0
+  - component: gitlab.com/phpboyscout/cicd/zensical-pages@v0.23.0
     inputs:
       stage: pages
       # zensical.toml + docs/ + requirements-lock.txt all at repo root.
