@@ -62,8 +62,10 @@ check "ci_provider_inputs" {
 # ---------- GitHub path (terraform-aws-modules/iam wrap) --------------
 
 module "github_oidc_provider" {
-  # checkov:skip=CKV_TF_1:Terraform Registry sources use semver tags, not commit hashes. `~> 5.0` allows minor + patch updates and is the conventional pinning for terraform-aws-modules; Dependabot tracks new majors.
-  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-provider"
+  # checkov:skip=CKV_TF_1:Terraform Registry sources use semver tags, not commit hashes. `~> 6.0` allows minor + patch updates and is the conventional pinning for terraform-aws-modules; Renovate tracks new majors.
+  # v6 renamed this submodule iam-github-oidc-provider -> iam-oidc-provider
+  # (generalised, no longer GitHub-specific). See docs/UPGRADE-6.0.md.
+  source  = "terraform-aws-modules/iam/aws//modules/iam-oidc-provider"
   version = "~> 6.0"
 
   count = local.is_github && var.create_oidc_provider ? 1 : 0
@@ -72,15 +74,21 @@ module "github_oidc_provider" {
 }
 
 module "github_role" {
-  # checkov:skip=CKV_TF_1:Terraform Registry sources use semver tags, not commit hashes. `~> 5.0` allows minor + patch updates and is the conventional pinning for terraform-aws-modules; Dependabot tracks new majors.
-  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
+  # checkov:skip=CKV_TF_1:Terraform Registry sources use semver tags, not commit hashes. `~> 6.0` allows minor + patch updates and is the conventional pinning for terraform-aws-modules; Renovate tracks new majors.
+  # v6 removed the iam-github-oidc-role submodule and folded it into
+  # iam-role behind `enable_github_oidc`; `subjects` became
+  # `oidc_subjects`. Outputs (.arn/.name) and policies/tags are unchanged.
+  # See docs/UPGRADE-6.0.md.
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
   version = "~> 6.0"
 
   count = local.is_github ? 1 : 0
 
-  name     = var.role_name
-  subjects = local.subjects
-  policies = var.policy_arns
+  enable_github_oidc = true
+
+  name          = var.role_name
+  oidc_subjects = local.subjects
+  policies      = var.policy_arns
 
   max_session_duration = var.max_session_duration
 
