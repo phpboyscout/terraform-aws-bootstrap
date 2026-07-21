@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.1](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/releases/v0.3.1)
+
+[Compare to previous version](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/compare/v0.3.0...v0.3.1)
+
+### Bug Fixes
+
+- **automation-iam**: migrate GitHub OIDC modules to iam/aws v6 ([62bedde](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/commit/62bedde2a5c8d74709373bd9f8c3d8b5cdce986a))
+- guard workflow dedup rule so release tag pipelines fire ([5531bf9](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/commit/5531bf98de4c29a008fb956b792bf3b7905a0bdc))
+
 ## [v0.3.0](https://gitlab.com/phpboyscout/terraform-aws-bootstrap/-/releases/v0.3.0)
 
 ### Features
