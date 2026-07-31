@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.3.2](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/releases/v0.3.2)
+
+[Compare to previous version](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/compare/v0.3.1...v0.3.2)
+
+### Bug Fixes
+
+- **ci**: publish on tag from a real stage, not .post ([4e1797b](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/commit/4e1797b600b2780c4450247e488c0c8006eadef6))
+
 ## [v0.3.1](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/releases/v0.3.1)
 
 [Compare to previous version](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/compare/v0.3.0...v0.3.1)
