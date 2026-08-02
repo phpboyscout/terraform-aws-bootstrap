@@ -2,6 +2,21 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "gitlab>phpboyscout/cicd:tofu",
-    "gitlab>phpboyscout/cicd:library"
-  ]
+    "gitlab>phpboyscout/cicd:library",
+    "gitlab>phpboyscout/cicd:terraform-docs"
+  ],
+  "postUpgradeTasks": {
+    "commands": [
+      "terraform-docs --output-mode=inject --output-file=README.md markdown table .",
+      "terraform-docs --output-mode=inject --output-file=README.md markdown table modules/automation-iam",
+      "terraform-docs --output-mode=inject --output-file=README.md markdown table modules/nuke-config",
+      "terraform-docs --output-mode=inject --output-file=README.md markdown table modules/state-backend",
+      "terraform-docs --output-mode=inject --output-file=README.md markdown table examples/minimal",
+      "terraform-docs --output-mode=inject --output-file=README.md markdown table examples/gitlab"
+    ],
+    "fileFilters": [
+      "**/README.md"
+    ],
+    "executionMode": "branch"
+  }
 }
