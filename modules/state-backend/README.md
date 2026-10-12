@@ -23,7 +23,7 @@ backend config) — no DynamoDB lock table.
 ```hcl
 module "state_backend" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/state-backend"
-  version = "0.2.1"
+  version = "0.3.2"
 
   name       = "phpboyscout-tfstate-111122223333"
   region     = "eu-west-2"

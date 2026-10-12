@@ -23,7 +23,7 @@ a chicken-and-egg with state. This module is just the config.
 ```hcl
 module "nuke_config" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/nuke-config"
-  version = "0.2.1"
+  version = "0.3.2"
 
   account_id = "111122223333"
   regions    = ["global", "eu-west-2"]

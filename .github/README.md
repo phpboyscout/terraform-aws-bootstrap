@@ -18,7 +18,7 @@ from there rather than from a git source:
 ```hcl
 module "bootstrap" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws"
-  version = "0.2.1"
+  version = "0.3.2"
 }
 ```
 

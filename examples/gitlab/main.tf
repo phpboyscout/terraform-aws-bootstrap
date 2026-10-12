@@ -9,7 +9,7 @@
 # Real callers would write:
 #
 #   source  = "gitlab.com/phpboyscout/bootstrap/aws"
-#   version = "0.2.1"
+#   version = "0.3.2"
 # (or the gitlab.com mirror once that lands).
 
 module "bootstrap" {

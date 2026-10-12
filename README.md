@@ -29,10 +29,14 @@ module does the bare minimum so you can stand the rest up via CI.
 
 ## Quick start
 
+Pre-1.0, so pin an exact version. The examples below use the latest at the
+time of writing; the [tags page](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/tags)
+lists the current one.
+
 ```hcl
 module "bootstrap" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws"
-  version = "0.2.1"
+  version = "0.3.2"
 
   account_id   = "111122223333"
   region       = "eu-west-2"
@@ -55,7 +59,7 @@ For GitLab CI, switch the `ci_provider` and pass `gitlab_project` instead:
 ```hcl
 module "bootstrap" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws"
-  version = "0.2.1"
+  version = "0.3.2"
 
   account_id     = "111122223333"
   region         = "eu-west-2"

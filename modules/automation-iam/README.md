@@ -37,7 +37,7 @@ symmetric. CI pipelines configure their token's audience to match.
 ```hcl
 module "automation_iam" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/automation-iam"
-  version = "0.2.1"
+  version = "0.3.2"
 
   ci_provider = "github"   # the default; can be omitted.
   github_repo = "example-org/example-repo"
@@ -71,7 +71,7 @@ steps:
 ```hcl
 module "automation_iam" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/automation-iam"
-  version = "0.2.1"
+  version = "0.3.2"
 
   ci_provider    = "gitlab"
   gitlab_project = "example-org/example-repo"
