@@ -17,10 +17,10 @@ actually `tofu apply` against your own account:
 ```sh
 tofu init
 tofu plan \
-  -var 'account_id=049815585546' \
+  -var 'account_id=111122223333' \
   -var 'region=eu-west-2' \
   -var 'project_name=phpboyscout' \
-  -var 'gitlab_project=phpboyscout/infra'
+  -var 'gitlab_project=example-org/example-repo'
 ```
 
 …or drop a `terraform.tfvars` next to `main.tf`.

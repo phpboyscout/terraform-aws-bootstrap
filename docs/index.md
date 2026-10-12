@@ -34,9 +34,8 @@ automation role this module creates.
 
 ## Related projects
 
-- **[`phpboyscout/infra`](https://gitlab.com/phpboyscout/infra)** — the first
-  user of this module; private, defines the AWS account that supports
-  `go-tool-base` and `rust-tool-base`.
+- The first user of this module is a private repository that defines the
+  AWS account supporting `go-tool-base` and `rust-tool-base`.
 - **[`go-tool-base`](https://github.com/phpboyscout/go-tool-base)** and
   **[`rust-tool-base`](https://github.com/phpboyscout/rust-tool-base)** — the
   open-source CLI frameworks the AWS account ultimately exists to support.

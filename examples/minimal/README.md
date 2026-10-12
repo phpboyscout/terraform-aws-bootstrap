@@ -11,10 +11,10 @@ inputs:
 ```sh
 tofu init
 tofu plan \
-  -var 'account_id=049815585546' \
+  -var 'account_id=111122223333' \
   -var 'region=eu-west-2' \
   -var 'project_name=phpboyscout' \
-  -var 'github_repo=phpboyscout/infra'
+  -var 'github_repo=example-org/example-repo'
 ```
 
 …or drop a `terraform.tfvars` next to `main.tf` (gitignored anyway

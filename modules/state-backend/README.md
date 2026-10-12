@@ -25,14 +25,14 @@ module "state_backend" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/state-backend"
   version = "0.2.1"
 
-  name       = "phpboyscout-tfstate-049815585546"
+  name       = "phpboyscout-tfstate-111122223333"
   region     = "eu-west-2"
-  account_id = "049815585546"
+  account_id = "111122223333"
 
   tags = {
     Project    = "phpboyscout"
     ManagedBy  = "opentofu"
-    Repository = "phpboyscout/infra"
+    Repository = "example-org/example-repo"
   }
 }
 ```
@@ -42,11 +42,11 @@ The consuming stack then wires its backend like:
 ```hcl
 terraform {
   backend "s3" {
-    bucket       = "phpboyscout-tfstate-049815585546"
+    bucket       = "phpboyscout-tfstate-111122223333"
     key          = "live/dev/terraform.tfstate"
     region       = "eu-west-2"
     encrypt      = true
-    kms_key_id   = "arn:aws:kms:eu-west-2:049815585546:key/<key-id>"
+    kms_key_id   = "arn:aws:kms:eu-west-2:111122223333:key/<key-id>"
     use_lockfile = true
   }
 }

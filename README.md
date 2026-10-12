@@ -34,18 +34,18 @@ module "bootstrap" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws"
   version = "0.2.1"
 
-  account_id   = "049815585546"
+  account_id   = "111122223333"
   region       = "eu-west-2"
   project_name = "phpboyscout"
 
   # GitHub OIDC trust (the default) — the automation role can be assumed
   # by workflows in this repo, scoped to main and pull-request refs.
-  github_repo  = "phpboyscout/infra"
+  github_repo  = "example-org/example-repo"
 
   tags = {
     Project    = "phpboyscout"
     ManagedBy  = "opentofu"
-    Repository = "phpboyscout/infra"
+    Repository = "example-org/example-repo"
   }
 }
 ```
@@ -57,11 +57,11 @@ module "bootstrap" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws"
   version = "0.2.1"
 
-  account_id     = "049815585546"
+  account_id     = "111122223333"
   region         = "eu-west-2"
   project_name   = "phpboyscout"
   ci_provider    = "gitlab"
-  gitlab_project = "phpboyscout/infra"
+  gitlab_project = "example-org/example-repo"
 
   # Skip the S3 state backend when using GitLab-managed HTTP state.
   enable_state_backend = false

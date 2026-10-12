@@ -25,7 +25,7 @@ module "nuke_config" {
   source  = "gitlab.com/phpboyscout/bootstrap/aws//modules/nuke-config"
   version = "0.2.1"
 
-  account_id = "049815585546"
+  account_id = "111122223333"
   regions    = ["global", "eu-west-2"]
 
   filters = {

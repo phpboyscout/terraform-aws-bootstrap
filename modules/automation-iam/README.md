@@ -40,13 +40,13 @@ module "automation_iam" {
   version = "0.2.1"
 
   ci_provider = "github"   # the default; can be omitted.
-  github_repo = "phpboyscout/infra"
+  github_repo = "example-org/example-repo"
   role_name   = "phpboyscout-automation"
 
   tags = {
     Project    = "phpboyscout"
     ManagedBy  = "opentofu"
-    Repository = "phpboyscout/infra"
+    Repository = "example-org/example-repo"
   }
 }
 ```
@@ -74,7 +74,7 @@ module "automation_iam" {
   version = "0.2.1"
 
   ci_provider    = "gitlab"
-  gitlab_project = "phpboyscout/infra"
+  gitlab_project = "example-org/example-repo"
   role_name      = "phpboyscout-automation"
 }
 ```
@@ -109,19 +109,19 @@ override `subject_filters`:
 module "ci_plan_role" {
   source          = "..."
   ci_provider     = "gitlab"
-  gitlab_project  = "phpboyscout/infra"
+  gitlab_project  = "example-org/example-repo"
   role_name       = "gl-oidc-plan-prod"
   policy_arns     = { ReadOnly = "arn:aws:iam::aws:policy/ReadOnlyAccess" }
-  subject_filters = ["project_path:phpboyscout/infra:*"]   # any ref can plan
+  subject_filters = ["project_path:example-org/example-repo:*"]   # any ref can plan
 }
 
 module "ci_apply_role" {
   source                = "..."
   ci_provider           = "gitlab"
-  gitlab_project        = "phpboyscout/infra"
+  gitlab_project        = "example-org/example-repo"
   role_name             = "gl-oidc-apply-prod"
   policy_arns           = { Admin = "arn:aws:iam::aws:policy/AdministratorAccess" }
-  subject_filters       = ["project_path:phpboyscout/infra:ref_type:branch:ref:main"]
+  subject_filters       = ["project_path:example-org/example-repo:ref_type:branch:ref:main"]
   create_oidc_provider  = false  # IDP already exists from the plan call
 }
 ```
