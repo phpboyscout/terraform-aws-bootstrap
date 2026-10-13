@@ -1,5 +1,22 @@
 # Changelog
 
+## [v0.4.0](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/releases/v0.4.0)
+
+[Compare to previous version](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/compare/v0.3.2...v0.4.0)
+
+### Notes
+
+- The automation role takes an optional permissions boundary: `permissions_boundary` on `automation-iam`, `automation_permissions_boundary` on the root module. It defaults to none.
+
+- The CI automation role is now fenced to the primary region by default: any regional action outside `region` is denied. Global services (IAM, STS, Organizations, budgets, Cost Explorer and the rest of `globally_scoped_actions`, most of which answer from us-east-1) keep working. A regional resource that has to live in us-east-1 does not; an ACM certificate for CloudFront is the usual case. If your CI works in more than one region, widen the fence before upgrading, for example `allowed_regions = ["eu-west-2", "us-east-1"]`, or pass `allowed_regions = []` to turn it off.
+
+- Releases are announced to the estate's release feed.
+
+### Features
+
+- **automation-iam**: accept an optional permissions boundary ([99bbe3b](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/commit/99bbe3ba1bef64467121082bc6f787f621e9d935))
+- **automation-iam**: fence the automation role to allowed regions ([c26cf93](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/commit/c26cf9377e330cc4260312bfdd04916097e2501d))
+
 ## [v0.3.2](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/releases/v0.3.2)
 
 [Compare to previous version](https://gitlab.com/phpboyscout/iac/terraform-aws-bootstrap/-/compare/v0.3.1...v0.3.2)
