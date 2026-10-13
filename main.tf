@@ -44,6 +44,7 @@ module "automation_iam" {
   policy_arns          = var.automation_policy_arns
   subject_filters      = var.automation_subject_filters
   create_oidc_provider = var.automation_create_oidc_provider
+  permissions_boundary = var.automation_permissions_boundary
   allowed_regions      = var.allowed_regions != null ? var.allowed_regions : [var.region]
 
   tags = var.tags

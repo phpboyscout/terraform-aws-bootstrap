@@ -102,8 +102,14 @@ Per-provider default `subject_filters`:
 | `github` | `repo:<repo>:ref:refs/heads/main` (apply on `main` push) + `repo:<repo>:pull_request` (plan on PR) |
 | `gitlab` | `project_path:<project>:ref_type:branch:ref:*` (any branch / MR pipeline) + `project_path:<project>:ref_type:tag:ref:*` (any tag, e.g. release apply) |
 
-For plan-vs-apply role separation, call this module once per role and
-override `subject_filters`:
+### Separate plan and apply roles
+
+The module creates one role per call, deliberately. To plan with
+read-only access from any ref and apply only from `main`, call it twice
+and override `subject_filters` on each. The second call sets
+`create_oidc_provider = false`, because the account holds one IDP per
+provider URL. The region fence applies to each role; the boundary is
+usually only worth setting on the apply role.
 
 ```hcl
 module "ci_plan_role" {
@@ -123,8 +129,12 @@ module "ci_apply_role" {
   policy_arns           = { Admin = "arn:aws:iam::aws:policy/AdministratorAccess" }
   subject_filters       = ["project_path:example-org/example-repo:ref_type:branch:ref:main"]
   create_oidc_provider  = false  # IDP already exists from the plan call
+  permissions_boundary  = "arn:aws:iam::111122223333:policy/ci-apply-boundary"
 }
 ```
+
+Wire the plan role's ARN into merge-request pipelines and the apply
+role's into the `main` pipeline. A single-role consumer changes nothing.
 
 ## Tightening permissions
 
@@ -140,6 +150,20 @@ policy_arns = {
   IAMReadOnly = "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
 }
 ```
+
+### Permissions boundary
+
+`permissions_boundary` takes a managed policy ARN and sets it as the
+role's boundary, so the role can never act beyond it whatever
+`policy_arns` grants. It defaults to `null`, which attaches no boundary.
+
+A boundary on this role does not carry over to IAM principals the role
+creates. To stop CI minting a role more powerful than itself, put a
+condition on `iam:PermissionsBoundary` in the boundary policy (or the
+attached policies) so `iam:CreateRole` and `iam:CreateUser` only succeed
+when the new principal carries the same boundary, and deny
+`iam:DeleteRolePermissionsBoundary` and
+`iam:DeleteUserPermissionsBoundary`.
 
 ## Region restriction
 
@@ -202,6 +226,7 @@ allowed_regions = ["eu-west-2", "us-east-1"]
 | <a name="input_gitlab_project_id"></a> [gitlab\_project\_id](#input\_gitlab\_project\_id) | Stable numeric GitLab project ID to lock the trust policy to (the `gitlab.com:project_id` OIDC claim). On GitLab.com SaaS, project paths can be reclaimed by other users after deletion — pinning by ID is the AWS-recommended hardening. Strongly recommended when `ci_provider = "gitlab"`; left `null` for backward compatibility. | `string` | `null` | no |
 | <a name="input_globally_scoped_actions"></a> [globally\_scoped\_actions](#input\_globally\_scoped\_actions) | Action patterns exempt from the region restriction, because their services are global (most answer from us-east-1) and do not honour `aws:RequestedRegion`. The default matches the security baseline's operator role, plus `budgets:*`. | `list(string)` | <pre>[<br/>  "iam:*",<br/>  "sts:*",<br/>  "cloudfront:*",<br/>  "route53:*",<br/>  "route53domains:*",<br/>  "organizations:*",<br/>  "support:*",<br/>  "trustedadvisor:*",<br/>  "waf:*",<br/>  "wafv2:*",<br/>  "shield:*",<br/>  "globalaccelerator:*",<br/>  "account:*",<br/>  "aws-portal:*",<br/>  "billing:*",<br/>  "budgets:*",<br/>  "ce:*",<br/>  "cur:*",<br/>  "savingsplans:*",<br/>  "tax:*",<br/>  "payments:*",<br/>  "health:*",<br/>  "kms:DescribeKey",<br/>  "kms:ListAliases"<br/>]</pre> | no |
 | <a name="input_max_session_duration"></a> [max\_session\_duration](#input\_max\_session\_duration) | Maximum session duration for the role, in seconds. AWS-allowed range is 3600–43200 (1–12 hours). | `number` | `3600` | no |
+| <a name="input_permissions_boundary"></a> [permissions\_boundary](#input\_permissions\_boundary) | ARN of a managed policy to set as the role's permissions boundary, capping what its attached policies can grant. Null attaches no boundary. | `string` | `null` | no |
 | <a name="input_policy_arns"></a> [policy\_arns](#input\_policy\_arns) | Map of IAM policy attachments to apply to the role. Keys are stable identifiers (used as Terraform resource keys); values are policy ARNs. Default attaches `AdministratorAccess` — tighten via override for production. | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the IAM role assumed by the CI pipeline via OIDC. Convention: `gh-oidc-<purpose>` for GitHub, `gl-oidc-<purpose>` for GitLab (caller-supplied). | `string` | n/a | yes |
 | <a name="input_subject_filters"></a> [subject\_filters](#input\_subject\_filters) | OIDC `sub` claim patterns that may assume this role. Empty list uses the provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:*` + `ref_type:tag:ref:*`. | `list(string)` | `[]` | no |

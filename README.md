@@ -110,9 +110,11 @@ The full microsite — including specs and design rationale — is at
 - v0.2: GitLab CI support alongside GitHub Actions on `automation-iam`
   (additive, backward-compatible); root-level `enable_state_backend`
   toggle for consumers that manage state externally.
-- v0.2+: tighten OIDC trust per-environment (separate plan/apply roles),
-  optional IAM policy boundary for the automation role, GitLab Terraform
-  Module Registry publishing for the canonical `source` form.
+- v0.2+: GitLab Terraform Module Registry publishing for the canonical
+  `source` form.
+- v0.4: the automation role is fenced to `allowed_regions` and takes
+  an optional permissions boundary. Separate plan and apply roles stay a
+  two-call recipe; see [`modules/automation-iam/`](./modules/automation-iam/).
 - Future: sibling repos `terraform-gcp-bootstrap` and `terraform-azure-bootstrap`
   with the same shape (state backend + automation identity + nuke-config) so
   callers can swap providers cleanly.
@@ -145,6 +147,7 @@ No resources.
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID this module bootstraps. Must match the credentials in use; the module's `allowed_account_ids` provider safety is the caller's job. | `string` | n/a | yes |
 | <a name="input_allowed_regions"></a> [allowed\_regions](#input\_allowed\_regions) | Regions the automation role may act in. Null restricts it to `[var.region]`, matching the security baseline's operator role. Pass a wider list for multi-region work, or `[]` to turn the restriction off. Global services (IAM, STS, Organizations, budgets, Cost Explorer and the like) stay reachable regardless. | `list(string)` | `null` | no |
 | <a name="input_automation_create_oidc_provider"></a> [automation\_create\_oidc\_provider](#input\_automation\_create\_oidc\_provider) | Whether to create the CI provider's OIDC IDP. Set to false if the account already has one (the IDP is a singleton per provider URL). | `bool` | `true` | no |
+| <a name="input_automation_permissions_boundary"></a> [automation\_permissions\_boundary](#input\_automation\_permissions\_boundary) | ARN of a managed policy to set as the automation role's permissions boundary. Null, the default, attaches none. | `string` | `null` | no |
 | <a name="input_automation_policy_arns"></a> [automation\_policy\_arns](#input\_automation\_policy\_arns) | IAM policies attached to the automation role. Default attaches `AdministratorAccess` — tighten for production-grade trust (e.g. PowerUserAccess + IAMReadOnlyAccess, or a custom managed policy). | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
 | <a name="input_automation_subject_filters"></a> [automation\_subject\_filters](#input\_automation\_subject\_filters) | OIDC subject claim patterns the automation role trusts. Empty list means use the sub-module's provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:*` + `ref_type:tag:ref:*`. | `list(string)` | `[]` | no |
 | <a name="input_ci_provider"></a> [ci\_provider](#input\_ci\_provider) | CI provider whose OIDC tokens the automation role trusts. One of `github` or `gitlab`. Default `github` preserves v0.1.x behaviour. | `string` | `"github"` | no |

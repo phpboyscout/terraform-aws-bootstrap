@@ -127,6 +127,12 @@ variable "automation_create_oidc_provider" {
   default     = true
 }
 
+variable "automation_permissions_boundary" {
+  description = "ARN of a managed policy to set as the automation role's permissions boundary. Null, the default, attaches none."
+  type        = string
+  default     = null
+}
+
 variable "allowed_regions" {
   description = "Regions the automation role may act in. Null restricts it to `[var.region]`, matching the security baseline's operator role. Pass a wider list for multi-region work, or `[]` to turn the restriction off. Global services (IAM, STS, Organizations, budgets, Cost Explorer and the like) stay reachable regardless."
   type        = list(string)

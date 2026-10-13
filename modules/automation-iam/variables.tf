@@ -95,6 +95,17 @@ variable "max_session_duration" {
   }
 }
 
+variable "permissions_boundary" {
+  description = "ARN of a managed policy to set as the role's permissions boundary, capping what its attached policies can grant. Null attaches no boundary."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.permissions_boundary == null || can(regex("^arn:aws[a-z-]*:iam::(aws|[0-9]{12}):policy/", var.permissions_boundary))
+    error_message = "permissions_boundary must be an IAM policy ARN, or null."
+  }
+}
+
 variable "allowed_regions" {
   description = "Regions the automation role may act in. Null restricts it to the provider's region. Pass a wider list for multi-region work, or `[]` to turn the restriction off. Services in `globally_scoped_actions` are exempt."
   type        = list(string)

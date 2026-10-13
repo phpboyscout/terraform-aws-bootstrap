@@ -100,6 +100,7 @@ module "github_role" {
   policies      = var.policy_arns
 
   max_session_duration = var.max_session_duration
+  permissions_boundary = var.permissions_boundary
 
   tags = local.tags
 
@@ -128,6 +129,7 @@ resource "aws_iam_role" "gitlab" {
   name                 = var.role_name
   assume_role_policy   = data.aws_iam_policy_document.gitlab_trust[0].json
   max_session_duration = var.max_session_duration
+  permissions_boundary = var.permissions_boundary
   tags                 = local.tags
 
   depends_on = [aws_iam_openid_connect_provider.gitlab]
