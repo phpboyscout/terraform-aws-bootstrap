@@ -94,3 +94,40 @@ variable "max_session_duration" {
     error_message = "max_session_duration must be 3600–43200 seconds (1–12 hours)."
   }
 }
+
+variable "allowed_regions" {
+  description = "Regions the automation role may act in. Null restricts it to the provider's region. Pass a wider list for multi-region work, or `[]` to turn the restriction off. Services in `globally_scoped_actions` are exempt."
+  type        = list(string)
+  default     = null
+}
+
+variable "globally_scoped_actions" {
+  description = "Action patterns exempt from the region restriction, because their services are global (most answer from us-east-1) and do not honour `aws:RequestedRegion`. The default matches the security baseline's operator role, plus `budgets:*`."
+  type        = list(string)
+  default = [
+    "iam:*",
+    "sts:*",
+    "cloudfront:*",
+    "route53:*",
+    "route53domains:*",
+    "organizations:*",
+    "support:*",
+    "trustedadvisor:*",
+    "waf:*",
+    "wafv2:*",
+    "shield:*",
+    "globalaccelerator:*",
+    "account:*",
+    "aws-portal:*",
+    "billing:*",
+    "budgets:*",
+    "ce:*",
+    "cur:*",
+    "savingsplans:*",
+    "tax:*",
+    "payments:*",
+    "health:*",
+    "kms:DescribeKey",
+    "kms:ListAliases",
+  ]
+}

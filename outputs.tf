@@ -51,6 +51,11 @@ output "automation_role_name" {
   value       = module.automation_iam.role_name
 }
 
+output "automation_allowed_regions" {
+  description = "Regions the automation role is fenced to. Empty means the restriction is off."
+  value       = module.automation_iam.allowed_regions
+}
+
 output "oidc_provider_arn" {
   description = "ARN of the OIDC IDP — `token.actions.githubusercontent.com` (GitHub) or `gitlab.com` (GitLab). Canonical for the account, regardless of who created it."
   value       = module.automation_iam.oidc_provider_arn

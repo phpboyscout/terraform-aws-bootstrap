@@ -20,7 +20,7 @@ variable "account_id" {
 }
 
 variable "region" {
-  description = "Primary region. The state-backend lives here; the automation role and OIDC provider are global IAM resources."
+  description = "Primary region. The state-backend lives here, and the automation role is fenced to it unless `allowed_regions` says otherwise. The role and OIDC provider themselves are global IAM resources."
   type        = string
 }
 
@@ -125,6 +125,12 @@ variable "automation_create_oidc_provider" {
   description = "Whether to create the CI provider's OIDC IDP. Set to false if the account already has one (the IDP is a singleton per provider URL)."
   type        = bool
   default     = true
+}
+
+variable "allowed_regions" {
+  description = "Regions the automation role may act in. Null restricts it to `[var.region]`, matching the security baseline's operator role. Pass a wider list for multi-region work, or `[]` to turn the restriction off. Global services (IAM, STS, Organizations, budgets, Cost Explorer and the like) stay reachable regardless."
+  type        = list(string)
+  default     = null
 }
 
 variable "nuke_filters" {

@@ -88,6 +88,13 @@ callers.
   Cloud Posse `context`.
 - **S3-native state locking.** Requires OpenTofu 1.10+ (or Terraform 1.10+).
   Consuming stacks set `use_lockfile = true` in their backend config.
+- **The automation role is fenced to `region`.** Regional actions anywhere
+  else are denied; global services (IAM, STS, Organizations, budgets, Cost
+  Explorer and the like, most of which answer from us-east-1) stay reachable.
+  If CI also works in another region, an ACM certificate in us-east-1 for
+  CloudFront being the usual case, widen it with
+  `allowed_regions = ["eu-west-2", "us-east-1"]`, or pass `[]` to turn the
+  fence off. See [`modules/automation-iam/`](./modules/automation-iam/).
 - **`prevent_destroy` on the state bucket.** A `tofu destroy` against the
   bootstrap stack won't take the state with it.
 
@@ -136,6 +143,7 @@ No resources.
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID this module bootstraps. Must match the credentials in use; the module's `allowed_account_ids` provider safety is the caller's job. | `string` | n/a | yes |
+| <a name="input_allowed_regions"></a> [allowed\_regions](#input\_allowed\_regions) | Regions the automation role may act in. Null restricts it to `[var.region]`, matching the security baseline's operator role. Pass a wider list for multi-region work, or `[]` to turn the restriction off. Global services (IAM, STS, Organizations, budgets, Cost Explorer and the like) stay reachable regardless. | `list(string)` | `null` | no |
 | <a name="input_automation_create_oidc_provider"></a> [automation\_create\_oidc\_provider](#input\_automation\_create\_oidc\_provider) | Whether to create the CI provider's OIDC IDP. Set to false if the account already has one (the IDP is a singleton per provider URL). | `bool` | `true` | no |
 | <a name="input_automation_policy_arns"></a> [automation\_policy\_arns](#input\_automation\_policy\_arns) | IAM policies attached to the automation role. Default attaches `AdministratorAccess` — tighten for production-grade trust (e.g. PowerUserAccess + IAMReadOnlyAccess, or a custom managed policy). | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
 | <a name="input_automation_subject_filters"></a> [automation\_subject\_filters](#input\_automation\_subject\_filters) | OIDC subject claim patterns the automation role trusts. Empty list means use the sub-module's provider-appropriate defaults: GitHub gets `refs/heads/main` + `pull_request`; GitLab gets `ref_type:branch:ref:*` + `ref_type:tag:ref:*`. | `list(string)` | `[]` | no |
@@ -149,7 +157,7 @@ No resources.
 | <a name="input_nuke_filters"></a> [nuke\_filters](#input\_nuke\_filters) | aws-nuke filters merged into the generated config. See modules/nuke-config/README.md for the grammar. Typical preservations: the bootstrap IAM user, the IAM account alias, the automation role and OIDC provider once they exist. | `any` | `{}` | no |
 | <a name="input_nuke_output_path"></a> [nuke\_output\_path](#input\_nuke\_output\_path) | Filesystem path for the rendered aws-nuke YAML. Null skips the disk write — the YAML is still available via the `nuke_config_yaml` output. Typical: `${path.root}/scripts/aws-nuke/config.yaml`. | `string` | `null` | no |
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Short, kebab-case identifier used to derive default resource names (state bucket, KMS alias, automation role). Override the individual `*_name` inputs to break this convention. | `string` | n/a | yes |
-| <a name="input_region"></a> [region](#input\_region) | Primary region. The state-backend lives here; the automation role and OIDC provider are global IAM resources. | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | Primary region. The state-backend lives here, and the automation role is fenced to it unless `allowed_regions` says otherwise. The role and OIDC provider themselves are global IAM resources. | `string` | n/a | yes |
 | <a name="input_state_bucket_name"></a> [state\_bucket\_name](#input\_state\_bucket\_name) | S3 bucket name for the remote state backend. Defaults to `<project_name>-tfstate-<account_id>`. S3 bucket names are globally unique; override if the default collides. Ignored when `enable_state_backend = false`. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to every taggable resource the state-backend and automation-iam sub-modules create. Merged on top of the consuming provider's `default_tags` — module-supplied tags win on key conflict. nuke-config has no taggable AWS resources, so it ignores this input. | `map(string)` | `{}` | no |
 
@@ -157,6 +165,7 @@ No resources.
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_automation_allowed_regions"></a> [automation\_allowed\_regions](#output\_automation\_allowed\_regions) | Regions the automation role is fenced to. Empty means the restriction is off. |
 | <a name="output_automation_role_arn"></a> [automation\_role\_arn](#output\_automation\_role\_arn) | ARN of the automation IAM role. Pass this to `aws-actions/configure-aws-credentials` (GitHub) or to the AWS CLI `--web-identity-token-file` flow (GitLab CI). |
 | <a name="output_automation_role_name"></a> [automation\_role\_name](#output\_automation\_role\_name) | Name of the automation role. |
 | <a name="output_ci_provider"></a> [ci\_provider](#output\_ci\_provider) | CI provider this bootstrap was configured for (`github` or `gitlab`). |

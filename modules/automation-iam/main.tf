@@ -14,6 +14,8 @@
 
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 locals {
   tags = merge({ Component = "automation-iam" }, var.tags)
 
@@ -41,6 +43,13 @@ locals {
   gitlab_oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.gitlab_provider_url}"
 
   oidc_provider_arn = local.is_github ? local.github_oidc_provider_arn : local.gitlab_oidc_provider_arn
+
+  role_name = local.is_github ? module.github_role[0].name : aws_iam_role.gitlab[0].name
+
+  # `id` rather than `name` or `region`: it is the region name under both
+  # AWS provider 5.x and 6.x, which renamed the attribute.
+  effective_allowed_regions  = var.allowed_regions != null ? var.allowed_regions : [data.aws_region.current.id]
+  region_restriction_enabled = length(local.effective_allowed_regions) > 0
 }
 
 # Cross-validate provider-specific inputs. Terraform variable validation
@@ -174,6 +183,37 @@ data "aws_iam_policy_document" "gitlab_trust" {
         variable = "${local.gitlab_provider_url}:namespace_id"
         values   = [var.gitlab_namespace_id]
       }
+    }
+  }
+}
+
+# ---------- Region restriction ----------------------------------------
+# Same shape as the security baseline's operator-role fence, so one rule
+# reads for both identities: deny anything outside `allowed_regions`
+# except the global services, which do not honour aws:RequestedRegion.
+
+resource "aws_iam_role_policy" "region_restriction" {
+  count = local.region_restriction_enabled ? 1 : 0
+
+  name   = "region-restriction"
+  role   = local.role_name
+  policy = data.aws_iam_policy_document.region_restriction.json
+}
+
+data "aws_iam_policy_document" "region_restriction" {
+  # checkov:skip=CKV_AWS_111:A Deny constrains rather than grants; the broad scope is the fence.
+  # checkov:skip=CKV_AWS_109:Same: a Deny with a broad NotAction is a region fence, not a grant.
+  # checkov:skip=CKV_AWS_356:Resources:* on a Deny applies the fence whatever the resource.
+  statement {
+    sid         = "DenyOutsideAllowedRegions"
+    effect      = "Deny"
+    not_actions = var.globally_scoped_actions
+    resources   = ["*"]
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:RequestedRegion"
+      values   = local.effective_allowed_regions
     }
   }
 }

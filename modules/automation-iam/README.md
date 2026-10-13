@@ -141,6 +141,31 @@ policy_arns = {
 }
 ```
 
+## Region restriction
+
+The role carries an inline `region-restriction` policy that denies any
+action whose `aws:RequestedRegion` is outside `allowed_regions`. It is
+the same fence the security baseline puts on the human operator role,
+so one rule reads for both identities.
+
+- Leave `allowed_regions` unset and the role is fenced to the region of
+  the AWS provider this module runs under. The root module passes
+  `[var.region]`.
+- Pass a wider list when CI legitimately works in more than one region.
+- Pass `[]` to turn the fence off.
+
+Global services do not honour `aws:RequestedRegion`, and most of them
+answer from us-east-1, so they are exempt through
+`globally_scoped_actions`: IAM, STS, Organizations, Route53, CloudFront,
+WAF, budgets, Cost Explorer, billing and the rest of that list. A
+regional resource that has to live in us-east-1 is not exempt. The
+common case is an ACM certificate for CloudFront, which a CI role
+fenced to eu-west-2 can no longer create:
+
+```hcl
+allowed_regions = ["eu-west-2", "us-east-1"]
+```
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -161,18 +186,21 @@ policy_arns = {
 | ---- | ---- |
 | [aws_iam_openid_connect_provider.gitlab](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider) | resource |
 | [aws_iam_role.gitlab](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy.region_restriction](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy_attachment.gitlab](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_allowed_regions"></a> [allowed\_regions](#input\_allowed\_regions) | Regions the automation role may act in. Null restricts it to the provider's region. Pass a wider list for multi-region work, or `[]` to turn the restriction off. Services in `globally_scoped_actions` are exempt. | `list(string)` | `null` | no |
 | <a name="input_ci_provider"></a> [ci\_provider](#input\_ci\_provider) | CI provider whose OIDC tokens this role trusts. One of `github` or `gitlab`. Default `github` preserves v0.1.x behaviour. | `string` | `"github"` | no |
 | <a name="input_create_oidc_provider"></a> [create\_oidc\_provider](#input\_create\_oidc\_provider) | Whether to create the OIDC identity provider. Set to false if the account already has one (only one IDP per provider URL is allowed per account). | `bool` | `true` | no |
 | <a name="input_github_repo"></a> [github\_repo](#input\_github\_repo) | GitHub `org/repo` slug whose OIDC tokens this role trusts. Required when `ci_provider = "github"`. Subject filters are constructed from this — override `subject_filters` if you need finer scoping (per-environment, per-ref, etc.). | `string` | `null` | no |
 | <a name="input_gitlab_namespace_id"></a> [gitlab\_namespace\_id](#input\_gitlab\_namespace\_id) | Stable numeric GitLab group/namespace ID to lock the trust policy to (the `gitlab.com:namespace_id` OIDC claim). Less restrictive than `gitlab_project_id` — trusts any project inside the group. AWS recommends setting at least one of project\_id / namespace\_id; left `null` for backward compatibility. | `string` | `null` | no |
 | <a name="input_gitlab_project"></a> [gitlab\_project](#input\_gitlab\_project) | GitLab `group/project` slug whose OIDC tokens this role trusts. Required when `ci_provider = "gitlab"`. Supports nested groups (`group/subgroup/project`). Subject filters are constructed from this — override `subject_filters` for finer scoping (per-branch, per-tag, etc.). | `string` | `null` | no |
 | <a name="input_gitlab_project_id"></a> [gitlab\_project\_id](#input\_gitlab\_project\_id) | Stable numeric GitLab project ID to lock the trust policy to (the `gitlab.com:project_id` OIDC claim). On GitLab.com SaaS, project paths can be reclaimed by other users after deletion — pinning by ID is the AWS-recommended hardening. Strongly recommended when `ci_provider = "gitlab"`; left `null` for backward compatibility. | `string` | `null` | no |
+| <a name="input_globally_scoped_actions"></a> [globally\_scoped\_actions](#input\_globally\_scoped\_actions) | Action patterns exempt from the region restriction, because their services are global (most answer from us-east-1) and do not honour `aws:RequestedRegion`. The default matches the security baseline's operator role, plus `budgets:*`. | `list(string)` | <pre>[<br/>  "iam:*",<br/>  "sts:*",<br/>  "cloudfront:*",<br/>  "route53:*",<br/>  "route53domains:*",<br/>  "organizations:*",<br/>  "support:*",<br/>  "trustedadvisor:*",<br/>  "waf:*",<br/>  "wafv2:*",<br/>  "shield:*",<br/>  "globalaccelerator:*",<br/>  "account:*",<br/>  "aws-portal:*",<br/>  "billing:*",<br/>  "budgets:*",<br/>  "ce:*",<br/>  "cur:*",<br/>  "savingsplans:*",<br/>  "tax:*",<br/>  "payments:*",<br/>  "health:*",<br/>  "kms:DescribeKey",<br/>  "kms:ListAliases"<br/>]</pre> | no |
 | <a name="input_max_session_duration"></a> [max\_session\_duration](#input\_max\_session\_duration) | Maximum session duration for the role, in seconds. AWS-allowed range is 3600–43200 (1–12 hours). | `number` | `3600` | no |
 | <a name="input_policy_arns"></a> [policy\_arns](#input\_policy\_arns) | Map of IAM policy attachments to apply to the role. Keys are stable identifiers (used as Terraform resource keys); values are policy ARNs. Default attaches `AdministratorAccess` — tighten via override for production. | `map(string)` | <pre>{<br/>  "AdministratorAccess": "arn:aws:iam::aws:policy/AdministratorAccess"<br/>}</pre> | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the IAM role assumed by the CI pipeline via OIDC. Convention: `gh-oidc-<purpose>` for GitHub, `gl-oidc-<purpose>` for GitLab (caller-supplied). | `string` | n/a | yes |
@@ -183,6 +211,7 @@ policy_arns = {
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_allowed_regions"></a> [allowed\_regions](#output\_allowed\_regions) | Regions the automation role is fenced to. Empty means the restriction is off. |
 | <a name="output_ci_provider"></a> [ci\_provider](#output\_ci\_provider) | CI provider this module instance is configured for (`github` or `gitlab`). |
 | <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the OIDC IDP — `token.actions.githubusercontent.com` (GitHub) or `gitlab.com` (GitLab). Returned regardless of whether this module created it (the ARN is canonical for the account). |
 | <a name="output_oidc_provider_created_here"></a> [oidc\_provider\_created\_here](#output\_oidc\_provider\_created\_here) | Whether this module call created the OIDC provider. False means the IDP existed before this apply (or was created by a separate call). |

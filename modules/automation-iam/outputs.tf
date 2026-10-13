@@ -5,7 +5,7 @@ output "role_arn" {
 
 output "role_name" {
   description = "Name of the IAM role."
-  value       = local.is_github ? module.github_role[0].name : aws_iam_role.gitlab[0].name
+  value       = local.role_name
 }
 
 output "oidc_provider_arn" {
@@ -26,4 +26,9 @@ output "ci_provider" {
 output "subjects" {
   description = "OIDC subject patterns this role trusts. Useful for documentation / debugging."
   value       = local.subjects
+}
+
+output "allowed_regions" {
+  description = "Regions the automation role is fenced to. Empty means the restriction is off."
+  value       = local.effective_allowed_regions
 }
